@@ -12,7 +12,7 @@ using NW.KnowledgeSpace.Backend.Data;
 namespace NW.KnowledgeSpace.Backend.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240203105624_Initial")]
+    [Migration("20240203115424_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -176,7 +176,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -197,7 +196,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
@@ -279,7 +277,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("SeoDescription")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -366,7 +363,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("ParentId")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
@@ -398,29 +394,24 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Environment")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ErrorMessage")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Labels")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("NumberOfComments")
@@ -438,7 +429,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("Problem")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -448,7 +438,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("varchar(500)");
 
                     b.Property<string>("StepToReproduce")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -457,7 +446,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Workaround")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -473,7 +461,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -527,7 +514,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -544,12 +530,10 @@ namespace NW.KnowledgeSpace.Backend.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ReportUserId")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 

@@ -23,33 +23,33 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
         [MaxLength(500)]
         [Required]
         [Column(TypeName = "varchar(500)")]
-        public string SeoAlias { get; set; }
+        public string SeoAlias { get; set; } = string.Empty;
 
         [MaxLength(500)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [MaxLength(500)]
-        public string Environment { get; set; }
+        public string? Environment { get; set; }
 
         [MaxLength(500)]
-        public string Problem { get; set; }
+        public string? Problem { get; set; }
 
-        public string StepToReproduce { get; set; }
-
-        [MaxLength(500)]
-        public string ErrorMessage { get; set; }
+        public string? StepToReproduce { get; set; }
 
         [MaxLength(500)]
-        public string Workaround { get; set; }
+        public string? ErrorMessage { get; set; }
 
-        public string Note { get; set; }
+        [MaxLength(500)]
+        public string? Workaround { get; set; }
+
+        public string? Note { get; set; }
 
         [Required]
         [MaxLength(50)]
         [Column(TypeName = "varchar(50)")]
-        public string OwnerUserId { get; set; }
+        public string OwnerUserId { get; set; } = string.Empty;
 
-        public string Labels { get; set; }
+        public string? Labels { get; set; }
 
         public DateTime CreateDate { get; set; }
 

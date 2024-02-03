@@ -8,11 +8,11 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
     {
         [MaxLength(50)]
         [Required]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
         [MaxLength(50)]
         [Required]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
         [Required]
         public DateTime Dob { get; set; }

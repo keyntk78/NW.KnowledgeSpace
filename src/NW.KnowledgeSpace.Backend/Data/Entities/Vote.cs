@@ -11,7 +11,7 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
 
         [MaxLength(50)]
         [Column(TypeName = "varchar(50)")]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         public DateTime CreateDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }

@@ -10,6 +10,6 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
 
         [MaxLength(50)]
         [Column(TypeName = "varchar(50)")]
-        public string LabelId { get; set; }
+        public string? LabelId { get; set; }
     }
 }

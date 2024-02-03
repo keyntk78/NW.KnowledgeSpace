@@ -13,15 +13,15 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
 
         [MaxLength(200)]
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [MaxLength(200)]
         [Column(TypeName = "varchar(200)")]
         [Required]
-        public string SeoAlias { get; set; }
+        public string SeoAlias { get; set; } = string.Empty;
 
         [MaxLength(500)]
-        public string SeoDescription { get; set; }
+        public string? SeoDescription { get; set; } 
 
         [Required]
         public int SortOrder { get; set; }

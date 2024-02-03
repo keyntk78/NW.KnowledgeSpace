@@ -13,16 +13,16 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
 
         [Required]
         [MaxLength(200)]
-        public string FileName { get; set; }
+        public string FileName { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(200)]
-        public string FilePath { get; set; }
+        public string FilePath { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(4)]
         [Column(TypeName = "varchar(4)")]
-        public string FileType { get; set; }
+        public string FileType { get; set; } = string.Empty;
 
         [Required]
         public long FileSize { get; set; }
@@ -34,7 +34,7 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
         [Required]
         [MaxLength(10)]
         [Column(TypeName = "varchar(10)")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         public DateTime CreateDate { get; set; }
         public DateTime? LastModifiedDate { get; set; }

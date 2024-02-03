@@ -8,9 +8,9 @@ namespace NW.KnowledgeSpace.Backend.Data.Entities
     {
         [MaxLength(50)]
         [Column(TypeName = "varchar(50)")]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [MaxLength(50)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }
