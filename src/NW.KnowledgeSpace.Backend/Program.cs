@@ -41,7 +41,8 @@ builder.Services.AddIdentityServer(options =>
 .AddInMemoryApiResources(Config.Apis)
 .AddInMemoryClients(Config.Clients)
 .AddInMemoryIdentityResources(Config.Ids)
-.AddAspNetIdentity<User>();
+.AddAspNetIdentity<User>()
+.AddDeveloperSigningCredential();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -63,7 +64,34 @@ builder.Services
     .AddControllersWithViews()
     .AddFluentValidation(fv=>fv.RegisterValidatorsFromAssemblyContaining<RoleVmValidator>());
 
-builder.Services.AddRazorPages();
+builder.Services.AddAuthentication()
+    .AddLocalApi("Bearer", option =>
+    {
+        option.ExpectedScope = "api.knowledgespace";
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Bearer", policy =>
+    {
+        policy.AddAuthenticationSchemes("Bearer");
+        policy.RequireAuthenticatedUser();
+    });
+});
+
+
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddAreaFolderRouteModelConvention("Identity", "/Account/", model =>
+    {
+        foreach (var selector in model.Selectors)
+        {
+            var attributeRouteModel = selector.AttributeRouteModel;
+            attributeRouteModel.Order = -1;
+            attributeRouteModel.Template = attributeRouteModel.Template.Remove(0, "Identity".Length);
+        }
+    });
+}); 
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -71,6 +99,28 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Knowledge Space API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.OAuth2,
+        Flows = new OpenApiOAuthFlows
+        {
+            Implicit = new OpenApiOAuthFlow
+            {
+                AuthorizationUrl = new Uri("https://localhost:5000/connect/authorize"),
+                Scopes = new Dictionary<string, string> { { "api.knowledgespace", "KnowledgeSpace API" } }
+            },
+        },
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            new List<string>{ "api.knowledgespace" }
+        }
+    });
 });
 
 builder.Services.AddTransient<DbInitializer>();
@@ -109,7 +159,11 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.OAuthClientId("swagger");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Knowledge Space API V1");
+    });
 }
 
 app.UseStaticFiles();
