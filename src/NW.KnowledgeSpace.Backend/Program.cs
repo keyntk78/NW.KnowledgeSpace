@@ -62,7 +62,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services
     .AddControllersWithViews()
-    .AddFluentValidation(fv=>fv.RegisterValidatorsFromAssemblyContaining<RoleVmValidator>());
+    .AddFluentValidation(fv=>fv.RegisterValidatorsFromAssemblyContaining<RoleCreateRequestValidator>());
 
 builder.Services.AddAuthentication()
     .AddLocalApi("Bearer", option =>
