@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NW.KnowledgeSpace.Backend.Data.Entities
 {
-    [Table("Users")]
     public class User : IdentityUser
     {
         [MaxLength(50)]
