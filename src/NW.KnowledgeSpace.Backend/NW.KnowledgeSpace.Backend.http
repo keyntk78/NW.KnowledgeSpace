@@ -1,0 +1,6 @@
+@NW.KnowledgeSpace.Backend_HostAddress = http://localhost:5240
+
+GET {{NW.KnowledgeSpace.Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
