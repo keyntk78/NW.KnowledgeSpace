@@ -1,11 +1,15 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using NW.KnowledgeSpace.Backend.Data;
 using NW.KnowledgeSpace.Backend.Data.Entities;
+using NW.KnowledgeSpace.Backend.IdentityServer;
+using NW.KnowledgeSpace.Backend.Services;
 using NW.KnowledgeSpace.ViewModel.Systems;
 using Serilog;
 
@@ -17,9 +21,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 //2. Setup idetntity
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+
+builder.Services.AddIdentityServer(options =>
+{
+    options.Events.RaiseErrorEvents = true;
+    options.Events.RaiseInformationEvents = true;
+    options.Events.RaiseFailureEvents = true;
+    options.Events.RaiseSuccessEvents = true;
+
+
+})
+.AddInMemoryApiResources(Config.Apis)
+.AddInMemoryClients(Config.Clients)
+.AddInMemoryIdentityResources(Config.Ids)
+.AddAspNetIdentity<User>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -38,15 +60,21 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 
 builder.Services
-    .AddControllers()
+    .AddControllersWithViews()
     .AddFluentValidation(fv=>fv.RegisterValidatorsFromAssemblyContaining<RoleVmValidator>());
+
+builder.Services.AddRazorPages();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Knowledge Space API", Version = "v1" });
+});
 
 builder.Services.AddTransient<DbInitializer>();
-
+builder.Services.AddTransient<IEmailSender, EmailSenderService>();
 //Serilog
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
@@ -54,9 +82,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-
-
 
 
 var app = builder.Build();
@@ -87,11 +112,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+app.UseIdentityServer();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapDefaultControllerRoute();
+
+app.MapRazorPages();
 
 app.Run();
