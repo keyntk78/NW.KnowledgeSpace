@@ -28,4 +28,8 @@
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NW.KnowledgeSpace.ViewModel\NW.KnowledgeSpace.ViewModel.csproj" />
+  </ItemGroup>
+
 </Project>
