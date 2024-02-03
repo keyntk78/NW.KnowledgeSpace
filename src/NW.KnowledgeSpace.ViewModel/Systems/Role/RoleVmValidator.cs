@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
+using NW.KnowledgeSpace.ViewModel.Systems.Role;
 
 namespace NW.KnowledgeSpace.ViewModel.Systems
 {
-    public class RoleVmValidator :AbstractValidator<RoleVm>
+    public class RoleVmValidator :AbstractValidator<RoleCreateRequest>
     {
         public RoleVmValidator()
         {

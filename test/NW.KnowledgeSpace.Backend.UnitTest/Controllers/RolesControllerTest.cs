@@ -9,7 +9,7 @@ using MockQueryable.Moq;
 using Moq;
 using NW.KnowledgeSpace.Backend.Controllers;
 using NW.KnowledgeSpace.ViewModel;
-using NW.KnowledgeSpace.ViewModel.Systems;
+using NW.KnowledgeSpace.ViewModel.Systems.Role;
 
 namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
 {
@@ -43,7 +43,7 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
             _mockRoleManager.Setup(x => x.CreateAsync(It.IsAny<IdentityRole>()))
                 .ReturnsAsync(IdentityResult.Success);
             var rolesController = new RolesController(_mockRoleManager.Object);
-            var result = await rolesController.PostRole(new RoleVm()
+            var result = await rolesController.PostRole(new RoleCreateRequest()
             {
                 Id = "test",
                 Name = "test"
@@ -59,7 +59,7 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
             _mockRoleManager.Setup(x => x.CreateAsync(It.IsAny<IdentityRole>()))
                 .ReturnsAsync(IdentityResult.Failed(new IdentityError[] { }));
             var rolesController = new RolesController(_mockRoleManager.Object);
-            var result = await rolesController.PostRole(new RoleVm()
+            var result = await rolesController.PostRole(new RoleCreateRequest()
             {
                 Id = "test",
                 Name = "test"
@@ -171,7 +171,7 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
             _mockRoleManager.Setup(x => x.UpdateAsync(It.IsAny<IdentityRole>()))
                 .ReturnsAsync(IdentityResult.Success);
             var rolesController = new RolesController(_mockRoleManager.Object);
-            var result = await rolesController.PutRole("test", new RoleVm()
+            var result = await rolesController.PutRole("test", new RoleCreateRequest()
             {
                 Id = "test",
                 Name = "test"
@@ -195,7 +195,7 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
                 .ReturnsAsync(IdentityResult.Failed(new IdentityError[] { }));
 
             var rolesController = new RolesController(_mockRoleManager.Object);
-            var result = await rolesController.PutRole("test", new RoleVm()
+            var result = await rolesController.PutRole("test", new RoleCreateRequest()
             {
                 Id = "test",
                 Name = "test"
