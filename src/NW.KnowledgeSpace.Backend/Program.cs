@@ -125,6 +125,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddTransient<DbInitializer>();
 builder.Services.AddTransient<IEmailSender, EmailSenderService>();
+builder.Services.AddTransient<ISequenceService, SequenceService>();
 //Serilog
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
