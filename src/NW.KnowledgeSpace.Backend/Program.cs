@@ -139,6 +139,10 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
+var _logger = new LoggerConfiguration().ReadFrom
+    .Configuration(builder.Configuration).Enrich.FromLogContext().CreateLogger();
+builder.Logging.AddSerilog(_logger);
+
 builder.Host.UseSerilog();
 
 
