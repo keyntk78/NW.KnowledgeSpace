@@ -1,6 +1,7 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NW.KnowledgeSpace.Backend.Data;
 using NW.KnowledgeSpace.Backend.Data.Entities;
+using NW.KnowledgeSpace.Backend.Extensions;
 using NW.KnowledgeSpace.Backend.IdentityServer;
 using NW.KnowledgeSpace.Backend.Services;
 using NW.KnowledgeSpace.ViewModel.Systems;
@@ -42,6 +44,7 @@ builder.Services.AddIdentityServer(options =>
 .AddInMemoryClients(Config.Clients)
 .AddInMemoryIdentityResources(Config.Ids)
 .AddAspNetIdentity<User>()
+.AddProfileService<IdentityProfileService>()
 .AddDeveloperSigningCredential();
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -59,6 +62,10 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;
 });
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 builder.Services
     .AddControllersWithViews()
@@ -166,6 +173,8 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Knowledge Space API V1");
     });
 }
+
+app.UseErrorWrapping();
 
 app.UseStaticFiles();
 app.UseIdentityServer();

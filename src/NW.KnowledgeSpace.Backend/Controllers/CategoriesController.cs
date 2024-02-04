@@ -5,6 +5,9 @@ using NW.KnowledgeSpace.Backend.Data.Entities;
 using NW.KnowledgeSpace.Backend.Data;
 using NW.KnowledgeSpace.ViewModel.Contents.Category;
 using NW.KnowledgeSpace.ViewModel;
+using NW.KnowledgeSpace.Backend.Authorization;
+using NW.KnowledgeSpace.Backend.Constants;
+using NW.KnowledgeSpace.Backend.Helpers;
 
 namespace NW.KnowledgeSpace.Backend.Controllers
 {
@@ -19,6 +22,8 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         }
 
         [HttpPost]
+        [ClaimRequirement(FunctionCode.CONTENT_CATEGORY, CommandCode.CREATE)]
+        [ApiValidationFilter]
         public async Task<IActionResult> PostCategory([FromBody] CategoryCreateRequest request)
         {
             var category = new Category()
@@ -38,11 +43,12 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new ApiBadRequestResponse("Create category failed"));
             }
         }
 
         [HttpGet]
+        [ClaimRequirement(FunctionCode.CONTENT_CATEGORY, CommandCode.VIEW)]
         public async Task<IActionResult> GetCategories()
         {
             var categorys = await _context.Categories.ToListAsync();
@@ -53,6 +59,7 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         }
 
         [HttpGet("filter")]
+        [ClaimRequirement(FunctionCode.CONTENT_CATEGORY, CommandCode.VIEW)]
         public async Task<IActionResult> GetCategoriesPaging(string filter, int pageIndex, int pageSize)
         {
             var query = _context.Categories.AsQueryable();
@@ -76,11 +83,12 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [ClaimRequirement(FunctionCode.CONTENT_CATEGORY, CommandCode.VIEW)]
         public async Task<IActionResult> GetById(string id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
-                return NotFound();
+                return NotFound(new ApiNotFoundResponse($"Category with id: {id} is not found"));
 
             CategoryVm categoryvm = CreateCategoryVm(category);
 
@@ -88,15 +96,17 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [ClaimRequirement(FunctionCode.CONTENT_CATEGORY, CommandCode.UPDATE)]
+        [ApiValidationFilter]
         public async Task<IActionResult> PutCategory(int id, [FromBody] CategoryCreateRequest request)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
-                return NotFound();
+                return NotFound(new ApiNotFoundResponse($"Category with id: {id} is not found"));
 
             if (id == request.ParentId)
             {
-                return BadRequest("Category cannot be a child itself.");
+                return BadRequest(new ApiBadRequestResponse("Category cannot be a child itself."));
             }
 
             category.Name = request.Name;
@@ -112,15 +122,16 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             {
                 return NoContent();
             }
-            return BadRequest();
+            return BadRequest(new ApiBadRequestResponse("Update category failed"));
         }
 
         [HttpDelete("{id}")]
+        [ClaimRequirement(FunctionCode.CONTENT_CATEGORY, CommandCode.DELETE)]
         public async Task<IActionResult> DeleteCategory(string id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
-                return NotFound();
+                return NotFound(new ApiNotFoundResponse($"Category with id: {id} is not found"));
 
             _context.Categories.Remove(category);
             var result = await _context.SaveChangesAsync();
