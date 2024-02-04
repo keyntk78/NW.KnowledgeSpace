@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NW.KnowledgeSpace.Backend.Data;
 using NW.KnowledgeSpace.Backend.Data.Entities;
 using NW.KnowledgeSpace.ViewModel;
+using NW.KnowledgeSpace.ViewModel.Systems.Function;
 using NW.KnowledgeSpace.ViewModel.Systems.Role;
 using NW.KnowledgeSpace.ViewModel.Systems.User;
 
@@ -14,11 +16,19 @@ namespace NW.KnowledgeSpace.Backend.Controllers
     public class UsersController : BaseController
     {
         private readonly UserManager<User> _userManager;
-
-        public UsersController(UserManager<User> userManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
+        public UsersController(UserManager<User> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
+            _context = context;
         }
+
+        #region Action Main
+
 
         [HttpPost]
         public async Task<IActionResult> PostUser(UserCreateRequest request)
@@ -163,5 +173,37 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             return BadRequest(result.Errors);
         }
 
+        #endregion
+
+        #region Menu
+
+        [HttpGet("{userId}/menu")]
+        public async Task<IActionResult> GetMenuByUserPermission(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
+            var query = from f in _context.Functions
+                join p in _context.Permissions
+                    on f.Id equals p.FunctionId
+                join r in _roleManager.Roles on p.RoleId equals r.Id
+                join a in _context.Commands
+                    on p.CommandId equals a.Id
+                where roles.Contains(r.Name) && a.Id == "VIEW"
+                select new FunctionVm
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    Url = f.Url,
+                    ParentId = f.ParentId,
+                    SortOrder = f.SortOrder,
+                };
+            var data = await query.Distinct()
+                .OrderBy(x => x.ParentId)
+                .ThenBy(x => x.SortOrder)
+                .ToListAsync();
+            return Ok(data);
+        }
+
+        #endregion
     }
 }
