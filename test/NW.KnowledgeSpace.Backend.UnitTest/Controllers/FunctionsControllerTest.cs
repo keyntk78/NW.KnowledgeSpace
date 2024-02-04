@@ -93,48 +93,48 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
             Assert.True(UserVms.Count() > 0);
         }
 
-        //[Fact]
-        //public async Task GetFunctionsPaging_NoFilter_ReturnSuccess()
-        //{
-        //    _context.Functions.AddRange(new List<Function>()
-        //    {
-        //        new Function(){
-        //            Id = "GetFunctionsPaging_NoFilter_ReturnSuccess1",
-        //            ParentId = null,
-        //            Name = "GetFunctionsPaging_NoFilter_ReturnSuccess1",
-        //            SortOrder =1,
-        //            Url ="/test1"
-        //        },
-        //         new Function(){
-        //            Id = "GetFunctionsPaging_NoFilter_ReturnSuccess2",
-        //            ParentId = null,
-        //            Name = "GetFunctionsPaging_NoFilter_ReturnSuccess2",
-        //            SortOrder =2,
-        //            Url ="/test2"
-        //        },
-        //          new Function(){
-        //            Id = "GetFunctionsPaging_NoFilter_ReturnSuccess3",
-        //            ParentId = null,
-        //            Name = "GetFunctionsPaging_NoFilter_ReturnSuccess3",
-        //            SortOrder = 3,
-        //            Url ="/test3"
-        //        },
-        //           new Function(){
-        //            Id = "GetFunctionsPaging_NoFilter_ReturnSuccess4",
-        //            ParentId = null,
-        //            Name = "GetFunctionsPaging_NoFilter_ReturnSuccess4",
-        //            SortOrder =4,
-        //            Url ="/test4"
-        //        }
-        //    });
-        //    await _context.SaveChangesAsync();
-        //    var functionsController = new FunctionsController(_context);
-        //    var result = await functionsController.GetFunctionsPaging(null, 1, 2);
-        //    var okResult = result as OkObjectResult;
-        //    var UserVms = okResult.Value as Pagination<FunctionVm>;
-        //    Assert.Equal(4, UserVms.TotalRecords);
-        //    Assert.Equal(2, UserVms.Items.Count);
-        //}
+        [Fact]
+        public async Task GetFunctionsPaging_NoFilter_ReturnSuccess()
+        {
+            _context.Functions.AddRange(new List<Function>()
+            {
+                new Function(){
+                    Id = "GetFunctionsPaging_NoFilter_ReturnSuccess1",
+                    ParentId = null,
+                    Name = "GetFunctionsPaging_NoFilter_ReturnSuccess1",
+                    SortOrder =1,
+                    Url ="/test1"
+                },
+                 new Function(){
+                    Id = "GetFunctionsPaging_NoFilter_ReturnSuccess2",
+                    ParentId = null,
+                    Name = "GetFunctionsPaging_NoFilter_ReturnSuccess2",
+                    SortOrder =2,
+                    Url ="/test2"
+                },
+                  new Function(){
+                    Id = "GetFunctionsPaging_NoFilter_ReturnSuccess3",
+                    ParentId = null,
+                    Name = "GetFunctionsPaging_NoFilter_ReturnSuccess3",
+                    SortOrder = 3,
+                    Url ="/test3"
+                },
+                   new Function(){
+                    Id = "GetFunctionsPaging_NoFilter_ReturnSuccess4",
+                    ParentId = null,
+                    Name = "GetFunctionsPaging_NoFilter_ReturnSuccess4",
+                    SortOrder =4,
+                    Url ="/test4"
+                }
+            });
+            await _context.SaveChangesAsync();
+            var functionsController = new FunctionsController(_context);
+            var result = await functionsController.GetFunctionsPaging(null, 1, 2);
+            var okResult = result as OkObjectResult;
+            var UserVms = okResult.Value as Pagination<FunctionVm>;
+            Assert.Equal(4, UserVms.TotalRecords);
+            Assert.Equal(2, UserVms.Items.Count);
+        }
 
         [Fact]
         public async Task GetUsersPaging_HasFilter_ReturnSuccess()
@@ -219,7 +219,7 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
                 SortOrder = 6,
                 Url = "/PutUser_ValidInput_Failed"
             });
-            Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
@@ -246,7 +246,7 @@ namespace NW.KnowledgeSpace.Backend.UnitTest.Controllers
         {
             var functionsController = new FunctionsController(_context);
             var result = await functionsController.DeleteFunction("DeleteUser_ValidInput_Failed");
-            Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<NotFoundObjectResult>(result);
         }
     }
 }

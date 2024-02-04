@@ -4,10 +4,12 @@ using Microsoft.Data.SqlClient;
 using NW.KnowledgeSpace.ViewModel.Systems.Permision;
 using System.Data;
 using Dapper;
+using NW.KnowledgeSpace.Backend.Authorization;
+using NW.KnowledgeSpace.Backend.Constants;
 
 namespace NW.KnowledgeSpace.Backend.Controllers
 {
-  
+
     public class PermissionsController : BaseController
     {
         private readonly IConfiguration _configuration;
@@ -22,6 +24,7 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ClaimRequirement(FunctionCode.SYSTEM_PERMISSION, CommandCode.VIEW)]
         public async Task<IActionResult> GetCommandViews()
         {
             using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))

@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NW.KnowledgeSpace.Backend.Authorization;
+using NW.KnowledgeSpace.Backend.Constants;
 using NW.KnowledgeSpace.Backend.Data;
 using NW.KnowledgeSpace.Backend.Data.Entities;
+using NW.KnowledgeSpace.Backend.Helpers;
 using NW.KnowledgeSpace.ViewModel;
 using NW.KnowledgeSpace.ViewModel.Systems.Function;
 using NW.KnowledgeSpace.ViewModel.Systems.Role;
@@ -11,13 +14,12 @@ using NW.KnowledgeSpace.ViewModel.Systems.User;
 
 namespace NW.KnowledgeSpace.Backend.Controllers
 {
-
-
     public class UsersController : BaseController
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
+
         public UsersController(UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context)
@@ -27,10 +29,9 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             _context = context;
         }
 
-        #region Action Main
-
-
         [HttpPost]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.CREATE)]
+        [ApiValidationFilter]
         public async Task<IActionResult> PostUser(UserCreateRequest request)
         {
             var user = new User()
@@ -50,11 +51,12 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             }
             else
             {
-                return BadRequest(result.Errors);
+                return BadRequest(new ApiBadRequestResponse(result));
             }
         }
 
         [HttpGet]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
         public async Task<IActionResult> GetUsers()
         {
             var users = _userManager.Users;
@@ -74,6 +76,7 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         }
 
         [HttpGet("filter")]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
         public async Task<IActionResult> GetUsersPaging(string filter, int pageIndex, int pageSize)
         {
             var query = _userManager.Users;
@@ -108,11 +111,12 @@ namespace NW.KnowledgeSpace.Backend.Controllers
 
         //URL: GET: http://localhost:5001/api/users/{id}
         [HttpGet("{id}")]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.VIEW)]
         public async Task<IActionResult> GetById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
-                return NotFound();
+                return NotFound(new ApiNotFoundResponse($"Cannot found user with id: {id}"));
 
             var userVm = new UserVm()
             {
@@ -128,11 +132,12 @@ namespace NW.KnowledgeSpace.Backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UserCreateRequest request)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
-                return NotFound();
+                return NotFound(new ApiNotFoundResponse($"Cannot found user with id: {id}"));
 
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
@@ -144,10 +149,29 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             {
                 return NoContent();
             }
-            return BadRequest(result.Errors);
+            return BadRequest(new ApiBadRequestResponse(result));
+        }
+
+        [HttpPut("{id}/change-password")]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.UPDATE)]
+        [ApiValidationFilter]
+        public async Task<IActionResult> PutUserPassword(string id, [FromBody] UserPasswordChangeRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound(new ApiNotFoundResponse($"Cannot found user with id: {id}"));
+
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return NoContent();
+            }
+            return BadRequest(new ApiBadRequestResponse(result));
         }
 
         [HttpDelete("{id}")]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER, CommandCode.DELETE)]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -170,12 +194,8 @@ namespace NW.KnowledgeSpace.Backend.Controllers
                 };
                 return Ok(uservm);
             }
-            return BadRequest(result.Errors);
+            return BadRequest(new ApiBadRequestResponse(result));
         }
-
-        #endregion
-
-        #region Menu
 
         [HttpGet("{userId}/menu")]
         public async Task<IActionResult> GetMenuByUserPermission(string userId)
@@ -183,27 +203,25 @@ namespace NW.KnowledgeSpace.Backend.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             var roles = await _userManager.GetRolesAsync(user);
             var query = from f in _context.Functions
-                join p in _context.Permissions
-                    on f.Id equals p.FunctionId
-                join r in _roleManager.Roles on p.RoleId equals r.Id
-                join a in _context.Commands
-                    on p.CommandId equals a.Id
-                where roles.Contains(r.Name) && a.Id == "VIEW"
-                select new FunctionVm
-                {
-                    Id = f.Id,
-                    Name = f.Name,
-                    Url = f.Url,
-                    ParentId = f.ParentId,
-                    SortOrder = f.SortOrder,
-                };
+                        join p in _context.Permissions
+                            on f.Id equals p.FunctionId
+                        join r in _roleManager.Roles on p.RoleId equals r.Id
+                        join a in _context.Commands
+                            on p.CommandId equals a.Id
+                        where roles.Contains(r.Name) && a.Id == "VIEW"
+                        select new FunctionVm
+                        {
+                            Id = f.Id,
+                            Name = f.Name,
+                            Url = f.Url,
+                            ParentId = f.ParentId,
+                            SortOrder = f.SortOrder,
+                        };
             var data = await query.Distinct()
                 .OrderBy(x => x.ParentId)
                 .ThenBy(x => x.SortOrder)
                 .ToListAsync();
             return Ok(data);
         }
-
-        #endregion
     }
 }
